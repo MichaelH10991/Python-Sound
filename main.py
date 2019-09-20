@@ -9,30 +9,35 @@ data_dir = './data/data_test'
 
 audio_files = glob(data_dir + '/*.wav')
 
-print(len(audio_files))
-print("processing...")
+# todo read file props and extract date
 
-loudness_list = []
-for file_name in audio_files:
-    """ iterates over files in the directory, calculating the average loudness for each """
-    print(f"Processing: {file_name}")
+print(f"processing {len(audio_files)} files")
+
+
+def get_props(file_name):
+    """gets file properties such as length. This should be converted to a props class"""
     audio, sfreq = lr.load(file_name)
     time = np.arange(0, len(audio)) / sfreq
-    loudness_list.append(sum(audio) / time[len(time)-1])
+    return [audio, time]
 
 
-fig, ax = plt.subplots()
-ax.plot([f"file: {round(n)}" for n in range(
-    len(audio_files))], loudness_list)
-ax.set(xlabel='File Name', ylabel="Average Loudness")
+def helper():
+    """Helper function to do stuff"""
+    loudness_list = []
+    for file_name in audio_files:
+        print(f"Processing: {file_name}")
+        props = get_props(file_name)
+        loudness_list.append(sum(props[0]) / props[1][len(props[1])-1])
+    display(audio_files, loudness_list)
 
-for tick in ax.xaxis.get_major_ticks():
-    tick.label.set_fontsize(5)
 
-ax.xaxis.label.set_size(10)
-plt.show()
+def display(audio_files, loudness_list):
+    """show the graph"""
+    fig, ax = plt.subplots()
+    ax.plot([f"file: {round(n)}" for n in range(
+        len(audio_files))], loudness_list)
+    ax.set(xlabel='File Name', ylabel="Average Loudness")
+    plt.show()
 
-# fig, ax = plt.subplots()
-# ax.plot(time, audio)
-# ax.set(xlabel='time (s)', ylabel='Sound Amplitude')
-# plt.show()
+
+helper()
